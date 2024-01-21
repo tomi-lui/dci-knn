@@ -16,7 +16,7 @@ Copyright (C) 2017    Ke Li
 '''
 
 import numpy as np
-from dciknn._dci import _dci_new, _dci_get_proj_vec, _dci_get_num_points, _dci_get_num_levels, _dci_add, _dci_query, _dci_clear, _dci_reset
+from ._dci import _dci_new, _dci_get_proj_vec, _dci_get_num_points, _dci_get_num_levels, _dci_add, _dci_query, _dci_clear, _dci_reset
 
 class ProtectedArray(object):
     # when_readable is a function that returns True when reading is allowed
