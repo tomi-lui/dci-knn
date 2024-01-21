@@ -16,7 +16,7 @@ Copyright (C) 2017    Ke Li
 '''
 
 import numpy as np
-from ._dci import _dci_new, _dci_get_proj_vec, _dci_get_num_points, _dci_get_num_levels, _dci_add, _dci_query, _dci_clear, _dci_reset
+from dciknn._dci import _dci_new, _dci_get_proj_vec, _dci_get_num_points, _dci_get_num_levels, _dci_add, _dci_query, _dci_clear, _dci_reset
 
 class ProtectedArray(object):
     # when_readable is a function that returns True when reading is allowed
@@ -104,7 +104,7 @@ class DCI(object):
     def _check_array(self, arr):
         if arr.shape[1] != self.dim:
             raise ValueError("mismatch between array dimension (%d) and the declared dimension of this DCI instance (%d)" % (arr.shape[1],self.dim))
-        if arr.dtype != np.float:
+        if arr.dtype != float:
             raise TypeError("array must consist of double-precision floats")
         if not arr.flags.c_contiguous:
             raise ValueError("the memory layout of array must be in row-major (C-order)")
@@ -112,10 +112,10 @@ class DCI(object):
     def _check_and_fix_array(self, arr):
         if arr.shape[1] != self.dim:
             raise ValueError("mismatch between array dimension (%d) and the declared dimension of this DCI instance (%d)" % (arr.shape[1],self.dim))
-        if arr.dtype == np.float and arr.flags.c_contiguous:
+        if arr.dtype == float and arr.flags.c_contiguous:
             return arr
         else:
-            return np.array(arr, dtype=np.float, copy=False, order='C')
+            return np.array(arr, dtype=float, copy=False, order='C')
     
     def _check_is_base_array(self, arr):
         # arr cannot be derived from some other array (except if it's just transposed, in which case the data pointer stays the same)
