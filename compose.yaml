@@ -5,4 +5,11 @@ services:
     volumes:
      - ./:/opt/dci
     working_dir: /opt/dci
-    
+  jupyter-dci:
+    image: jupyter-dci
+    volumes:
+      - ./:/opt/dci
+    working_dir: /opt/dci
+    ports:
+      - "8888:8888"
+    command: ["bash", "-c", "jupyter notebook --ip=0.0.0.0 --port=8888 --no-browser --allow-root --NotebookApp.token='123' --NotebookApp.password='123'"]
