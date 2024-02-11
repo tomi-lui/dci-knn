@@ -106,8 +106,8 @@ class DCI(object):
             raise ValueError("mismatch between array dimension (%d) and the declared dimension of this DCI instance (%d)" % (arr.shape[1],self.dim))
         if arr.dtype != float:
             raise TypeError("array must consist of double-precision floats")
-        if not arr.flags.c_contiguous:
-            raise ValueError("the memory layout of array must be in row-major (C-order)")
+        # if not arr.flags.c_contiguous:
+        #     raise ValueError("the memory layout of array must be in row-major (C-order)")
     
     def _check_and_fix_array(self, arr):
         if arr.shape[1] != self.dim:
@@ -132,7 +132,7 @@ class DCI(object):
     
     def _check_data(self, data):
         self._check_array(data)
-        self._check_is_base_array(data)
+        # self._check_is_base_array(data)
     
     def _check_and_fix_indices(self, data, indices):
         check_indices_within_bounds = False

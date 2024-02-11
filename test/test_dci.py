@@ -44,18 +44,15 @@ class TestDCI(unittest.TestCase):
         
         # Store the initial number of data points
         initial_num_points = self.dci_db.num_points
-        print("initial_num_points: ", initial_num_points)
-        
         print("Adding data... ")
         self.dci_db.add(self.data, num_levels=self.num_levels, field_of_view=self.construction_field_of_view, prop_to_retrieve=self.construction_prop_to_retrieve)
 
         # Get the number of data points after adding
         final_num_points = self.dci_db.num_points
-        print("data points after adding: ", final_num_points)
+        # print("data points after adding: ", final_num_points)
         
         # Assert that the number of data points has increased
         assert final_num_points > initial_num_points, "The number of data points did not increase after adding"
-        print("Querying... ")
 
 
     def test_add_non_contiguous(self):
@@ -74,10 +71,8 @@ class TestDCI(unittest.TestCase):
             AssertionError: If the number of data points does not increase after adding the sliced data.
         """
         print("Building DCI object... ")
-        
         # Slice the data and query numpy arrays
-        sliced_data = self.data[:self.num_points//2, :]
-        sliced_query = self.query[:self.num_queries//2, :]
+        sliced_data = self.data[::2, :]
         
         # Store the initial number of data points
         initial_num_points = self.dci_db.num_points
@@ -92,7 +87,6 @@ class TestDCI(unittest.TestCase):
         
         # Assert that the number of data points has increased
         assert final_num_points > initial_num_points, "The number of data points did not increase after adding"
-        print("Querying sliced data... ")
 
 
     def test_query_contiguous(self):
@@ -105,8 +99,9 @@ class TestDCI(unittest.TestCase):
         print("Querying... ")
         nearest_neighbour_idx, nearest_neighbour_dists = self.dci_db.query(self.query, num_neighbours=self.num_neighbours, field_of_view=self.query_field_of_view, prop_to_retrieve=self.query_prop_to_retrieve)
 
-        print("type of nearest_neighbour_dists", type(nearest_neighbour_idx))
-        print("type of nearest_neighbour_dist", type(nearest_neighbour_dists))
+        assert isinstance(nearest_neighbour_idx, list), "nearest_neighbour_idx is not a list"
+        assert isinstance(nearest_neighbour_idx[0], np.ndarray), "nearest_neighbour_idx[0] is not a numpy ndarray"
+        assert isinstance(nearest_neighbour_dists, list), "nearest_neighbour_idx is not a list"
 
 
     def test_query_non_contiguous(self):
@@ -125,19 +120,21 @@ class TestDCI(unittest.TestCase):
         print("Building DCI object... ")
         
         # Slice the data and query numpy arrays and create a copy of the sliced data
-        sliced_data = np.copy(self.data[:self.num_points//2, :])
-        sliced_query = np.copy(self.query[:self.num_queries//2, :])
+        sliced_data = self.data[::2, :]
+        sliced_query = np.copy(self.query[::2, :])
         
         self.dci_db.add(sliced_data, num_levels=self.num_levels, field_of_view=self.construction_field_of_view, prop_to_retrieve=self.construction_prop_to_retrieve)
 
         print("Querying sliced data... ")
         nearest_neighbour_idx, nearest_neighbour_dists = self.dci_db.query(sliced_query, num_neighbours=self.num_neighbours, field_of_view=self.query_field_of_view, prop_to_retrieve=self.query_prop_to_retrieve)
 
-        print("type of nearest_neighbour_dists", type(nearest_neighbour_idx))
-        print("type of nearest_neighbour_dist", type(nearest_neighbour_dists))
+        assert isinstance(nearest_neighbour_idx, list), "nearest_neighbour_idx is not a list"
+        assert isinstance(nearest_neighbour_idx[0], np.ndarray), "nearest_neighbour_idx[0] is not a numpy ndarray"
+        assert isinstance(nearest_neighbour_dists, list), "nearest_neighbour_idx is not a list"
 
 
 if __name__ == '__main__':
+    print("Running tests... ", "*" * 30)
     suite = unittest.TestSuite()
     suite.addTest(TestDCI('test_add_contiguous'))
     suite.addTest(TestDCI('test_add_non_contiguous'))

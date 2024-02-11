@@ -91,29 +91,39 @@ static PyObject *py_dci_add(PyObject *self, PyObject *args) {
     if (!py_data) return NULL;
     
     py_dci_inst = (py_dci *)PyCapsule_GetPointer(py_dci_inst_wrapper, "py_dci_inst");
-    
+
+    // Check if the array is contiguous
+    if (!PyArray_ISCONTIGUOUS(py_data)) {
+        // If not, create a new view of the array that is contiguous
+        py_data = (PyArrayObject *) PyArray_NewLikeArray(py_data, NPY_ARRAY_CARRAY, NULL, 1);
+        if (py_data == NULL) {
+            // Failed to create a contiguous view
+            return NULL;
+        }
+    }
+
     // Assuming row-major layout, py_data->data is N x D, where N is the number of data points and D is the dimensionality
-    data = (double *)py_data->data;
-	num_new_points = end_idx - start_idx;
-	dim = py_data->dimensions[1];
-	
+    data = (double *)PyArray_DATA(py_data);
+    num_new_points = end_idx - start_idx;
+    dim = PyArray_DIM(py_data, 1);
+
     if (num_new_points > 0) {
-        
+
         construction_query_config.blind = blind;
         construction_query_config.num_to_visit = num_to_visit;
         construction_query_config.num_to_retrieve = num_to_retrieve;
         construction_query_config.prop_to_visit = prop_to_visit;
         construction_query_config.prop_to_retrieve = prop_to_retrieve;
         construction_query_config.field_of_view = field_of_view;
-        
+
         dci_add(&(py_dci_inst->dci_inst), dim, num_new_points, &(data[start_idx*dim]), num_levels, construction_query_config);
         py_dci_inst->data_idx_offset = start_idx;
         py_dci_inst->py_array = py_data;
-        
+
         // py_dci_inst owns a reference to py_data and relinquishes it when database is cleared
         Py_INCREF(py_data);
     }
-    
+
     Py_INCREF(Py_None);
     return Py_None;
 }
@@ -140,6 +150,16 @@ static PyObject *py_dci_query(PyObject *self, PyObject *args) {
     
     py_dci_inst = (py_dci *)PyCapsule_GetPointer(py_dci_inst_wrapper, "py_dci_inst");
     
+    // Check if the array is contiguous
+    if (!PyArray_ISCONTIGUOUS(py_query)) {
+        // If not, create a new view of the array that is contiguous
+        py_query = (PyArrayObject *) PyArray_NewLikeArray(py_query, NPY_ARRAY_CARRAY, NULL, 1);
+        if (py_query == NULL) {
+            // Failed to create a contiguous view
+            return NULL;
+        }
+    }
+
     // Assuming row-major layout, py_query->data is N x D, where N is the number of queries and D is the dimensionality
     query = (double *)py_query->data;
 	num_queries = py_query->dimensions[0];
